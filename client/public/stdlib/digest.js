@@ -33,21 +33,16 @@ function subbytes(b, ofs, len) {
 
 function file(filename) {
   var ic = Pervasives.open_in_bin(filename);
-  var exit = 0;
   var d;
   try {
     d = Caml_external_polyfill.resolve("caml_md5_chan")(ic, -1);
-    exit = 1;
   }
   catch (e){
     Caml_external_polyfill.resolve("caml_ml_close_channel")(ic);
     throw e;
   }
-  if (exit === 1) {
-    Caml_external_polyfill.resolve("caml_ml_close_channel")(ic);
-    return d;
-  }
-  
+  Caml_external_polyfill.resolve("caml_ml_close_channel")(ic);
+  return d;
 }
 
 var output = Pervasives.output_string;
@@ -63,6 +58,12 @@ function char_hex(n) {
 }
 
 function to_hex(d) {
+  if (d.length !== 16) {
+    throw [
+          Caml_builtin_exceptions.invalid_argument,
+          "Digest.to_hex"
+        ];
+  }
   var result = Caml_bytes.caml_create_bytes(32);
   for(var i = 0; i <= 15; ++i){
     var x = Caml_string.get(d, i);
@@ -120,7 +121,10 @@ function from_hex(s) {
 
 var compare = $$String.compare;
 
+var equal = $$String.equal;
+
 exports.compare = compare;
+exports.equal = equal;
 exports.string = string;
 exports.bytes = bytes;
 exports.substring = substring;

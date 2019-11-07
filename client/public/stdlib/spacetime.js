@@ -11,44 +11,44 @@ function if_spacetime_enabled(f) {
 }
 
 function create(path) {
-  return /* record */[
-          /* channel */Pervasives.stdout,
-          /* closed */true
-        ];
+  return {
+          channel: Pervasives.stdout,
+          closed: true
+        };
 }
 
 function save_event(time, t, event_name) {
   return if_spacetime_enabled((function (param) {
-                return Caml_external_polyfill.resolve("caml_spacetime_only_works_for_native_code")(time, t[/* channel */0], event_name);
+                return Caml_external_polyfill.resolve("caml_spacetime_only_works_for_native_code")(time, t.channel, event_name);
               }));
 }
 
 function save_and_close(time, t) {
   return if_spacetime_enabled((function (param) {
-                if (t[/* closed */1]) {
+                if (t.closed) {
                   throw [
                         Caml_builtin_exceptions.failure,
                         "Series is closed"
                       ];
                 }
-                Caml_external_polyfill.resolve("caml_spacetime_only_works_for_native_code")(time, t[/* channel */0]);
-                var oc = t[/* channel */0];
+                Caml_external_polyfill.resolve("caml_spacetime_only_works_for_native_code")(time, t.channel);
+                var oc = t.channel;
                 Caml_io.caml_ml_flush(oc);
                 Caml_external_polyfill.resolve("caml_ml_close_channel")(oc);
-                t[/* closed */1] = true;
+                t.closed = true;
                 return /* () */0;
               }));
 }
 
-var Series = /* module */[
-  /* create */create,
-  /* save_event */save_event,
-  /* save_and_close */save_and_close
-];
+var Series = {
+  create: create,
+  save_event: save_event,
+  save_and_close: save_and_close
+};
 
 function take(time, param) {
-  var channel = param[/* channel */0];
-  var closed = param[/* closed */1];
+  var channel = param.channel;
+  var closed = param.closed;
   return if_spacetime_enabled((function (param) {
                 if (closed) {
                   throw [
@@ -61,7 +61,9 @@ function take(time, param) {
               }));
 }
 
-var Snapshot = /* module */[/* take */take];
+var Snapshot = {
+  take: take
+};
 
 function save_event_for_automatic_snapshots(event_name) {
   return if_spacetime_enabled((function (param) {

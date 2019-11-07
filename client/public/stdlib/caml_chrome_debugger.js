@@ -68,17 +68,6 @@ var variantCustomFormatter = function (data,recordVariant){
 
 };
 
-var recordPreview = function (recordLabels){
- var recordLastIndex = recordLabels.length - 1
- var preview = recordLabels.reduce(function (acc, cur, index) {
-     if (index === recordLastIndex) {
-         return acc + cur + "}"
-     }
-     return acc + cur + ", "
- }, "record {")
- return preview
-};
-
 var variantPreview = function (x, recordVariant){
  if(recordVariant === "::") {
    // show the length, just like for array
@@ -97,35 +86,25 @@ var isOCamlExceptionOrExtension = function(x){
 }
 var formatter = {
  header: function (x) {
-     var recordLabels
      var recordVariant
      var recordModule
      var recordPolyVar
-     if ((recordLabels = x[Symbol.for('BsRecord')]) !== undefined) {
-         return ['div', {}, recordPreview(recordLabels)]
-     } else if ((recordVariant =  x[Symbol.for('BsVariant')]) !== undefined){
+     if ((recordVariant =  x[Symbol.for('BsVariant')]) !== undefined){
          return variantPreview(x, recordVariant)
      } else if (isOCamlExceptionOrExtension(x)){
-       return ['div',{}, `${x[0][0]}(…)`]
-     } else if ((recordModule =  x[Symbol.for('BsLocalModule')]) !== undefined){
-       return ['div', {}, 'Module' ]
+       return ['div',{}, `${x[0][0]}(…)`]     
      } else if ((recordPolyVar = x[Symbol.for('BsPolyVar')] ) !== undefined){
        return ['div', {}, `\`${recordPolyVar}#${x[0]}`]
      }
      return null
  },
  hasBody: function (x) {
-     var recordLabels
      var recordVariant
      var recordModule
      var recordPolyVar
-     if ((recordLabels = x[Symbol.for('BsRecord')]) !== undefined) {
-         return true
-     } else if ((recordVariant = x[Symbol.for('BsVariant')] ) !== undefined){
+     if ((recordVariant = x[Symbol.for('BsVariant')] ) !== undefined){
          return recordVariant
      } else if(isOCamlExceptionOrExtension(x)){
-       return true
-     } else if ((recordModule = x[Symbol.for('BsLocalModule')] ) !== undefined){
        return true
      } else if( (recordPolyVar = x[Symbol.for('BsPolyVar')]) !== undefined){
        return true
@@ -133,15 +112,10 @@ var formatter = {
      return false
  },
  body: function (x) {
-     var recordLabels
      var recordVariant
      var recordModule
      var recordPolyVar
-     if ( (recordLabels = x[Symbol.for('BsRecord')]) !== undefined
-       ) {
-         return recordCustomFormatter(x, recordLabels)
-     }
-     else if ((recordModule = x[Symbol.for('BsLocalModule')]) !== undefined){
+     if ((recordModule = x[Symbol.for('BsLocalModule')]) !== undefined){
          return recordCustomFormatter(x, recordModule)
      }
      else if ((recordVariant = x[Symbol.for('BsVariant')]) !== undefined) {
@@ -166,22 +140,17 @@ return 0
 
 };
 
-var setup = /* record */[/* contents */false];
+var setup = {
+  contents: false
+};
 
 function setupOnce(param) {
-  if (setup[0]) {
+  if (setup.contents) {
     return 0;
   } else {
-    setup[0] = true;
+    setup.contents = true;
     return setupChromeDebugger(/* () */0);
   }
-}
-
-function record(meta, xs) {
-  setupOnce(/* () */0);
-  return Object.defineProperty(xs, Symbol.for("BsRecord"), {
-              value: meta
-            });
 }
 
 function variant(meta, tag, xs) {
@@ -199,13 +168,6 @@ function simpleVariant(meta, xs) {
             });
 }
 
-function localModule(meta, xs) {
-  setupOnce(/* () */0);
-  return Object.defineProperty(xs, Symbol.for("BsLocalModule"), {
-              value: meta
-            });
-}
-
 function polyVar(meta, xs) {
   setupOnce(/* () */0);
   return Object.defineProperty(xs, Symbol.for("BsPolyVar"), {
@@ -216,9 +178,7 @@ function polyVar(meta, xs) {
 var __ = Block.__;
 
 exports.__ = __;
-exports.record = record;
 exports.variant = variant;
 exports.simpleVariant = simpleVariant;
-exports.localModule = localModule;
 exports.polyVar = polyVar;
 /* No side effect */
