@@ -12,6 +12,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "bs-platform": "5.0.6"
+    "bs-platform": "^6.2.1"
+  },
+  "dependencies": {
+    "reason-react": "^0.7.0"
   }
 }

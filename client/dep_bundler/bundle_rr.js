@@ -54,13 +54,14 @@ let get_module_name = a => {
   return uppercase_first_char(file_name_without_ext);
 };
 
-let node_modules = resolve(__dirname, "../node_modules");
+let cwd = process.cwd();
+let node_modules = resolve(cwd, "node_modules");
 
 let main = async (pkg_name = "reason-react") => {
   let pkg_binary_artifact_path = resolve(node_modules, pkg_name, "lib/bs/src");
   let pkg_src_path = resolve(node_modules, pkg_name, "src");
 
-  let result_path = resolve(__dirname, pkg_name);
+  let result_path = resolve(cwd, pkg_name);
   let bs_js_path = resolve(result_path, `bs_${pkg_name}.js`);
 
   console.log("Making new output dir ", result_path);
