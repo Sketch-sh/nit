@@ -67,8 +67,6 @@ let default_value_react = {code|module Counter = {
 
 ReactDOMRe.renderToElementWithId(<Counter name="Counter" />, "root");|code};
 
-let default_value = default_value_react;
-
 let make_initial_files = value => {
   Belt.Map.String.empty
   ->Belt.Map.String.set("index.re", Edit_state.make_file(value))
@@ -83,7 +81,7 @@ let make_initial_files = value => {
 {|require("react-reflex/styles.css")|};
 
 [@react.component]
-let make = (~value=default_value) => {
+let make = (~value="") => {
   let (state, send) =
     ReactUpdate.useReducer(
       {

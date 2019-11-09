@@ -19,12 +19,13 @@ let make = () => {
 
   let query = url.ReasonReactRouter.search;
 
-  switch (parse_query_string("code", query)) {
-  | "" => <Edit_main />
-  | compressed_string =>
-    let value = LzString.URI.decompress(compressed_string);
-    <Edit_main value />;
-  };
+  let value =
+    switch (parse_query_string("code", query)) {
+    | "" => None
+    | compressed_string => LzString.URI.decompress(compressed_string)
+    };
+
+  <Edit_main ?value />;
 };
 
 let default = make;
