@@ -26,7 +26,7 @@ module InternalResult = {
     switch (Js.Nullable.toOption(jsObj##_type)) {
     | Some("error") =>
       let error = jsObj |> unsafeAsError;
-      Belt.Result.Error({
+      Result.Error({
         Error.message: error##text,
         loc:
           Some({
@@ -41,10 +41,7 @@ module InternalResult = {
           }),
       });
     | _ =>
-      Belt.Result.Ok({
-        code: (jsObj |> unsafeAsSuccess)##js_code,
-        warnings: "",
-      })
+      Result.Ok({code: (jsObj |> unsafeAsSuccess)##js_code, warnings: ""})
     };
 };
 
@@ -61,11 +58,11 @@ let compile = (compiler, code): compile_result => {
   json
   |> InternalResult.unsafeFromJson
   |> InternalResult.toResult
-  |> Belt.Result.(
-       fun
-       | Ok({code}) => Ok({code, warnings: ""})
-       | Error(error) => Error(error)
-     );
+  |> (
+    fun
+    | Ok({code}) => Ok({code, warnings: ""})
+    | Error(error) => Error(error)
+  );
 };
 
 let ocaml_compile = compile(ocaml_compile);

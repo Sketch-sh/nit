@@ -6,7 +6,18 @@ module S = {
   open Ds_unit;
 
   let header_element =
-    [borderBottom(BorderWidth.bw1, `solid, Color.light_3)]->style;
+    [
+      borderBottom(BorderWidth.bw1, `solid, Color.light_3),
+      after([
+        height(`px(3)),
+        contentRule(" "),
+        width(`percent(100.)),
+        position(`absolute),
+        left(`zero),
+        unsafe("background", "linear-gradient(to right, #9E7CC1, #8ECDEA)"),
+      ]),
+    ]
+    ->style;
 
   let header =
     [

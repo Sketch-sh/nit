@@ -15,6 +15,9 @@ module Space = {
 };
 
 module Color = {
+  let sketch_brand1 = `hex("36C1D7");
+  let sketch_brand2 = `hex("514B9C");
+
   let brand_dark3 = `hex("203D54");
   let brand_dark2 = `hex("1A4971");
   let brand_dark1 = `hex("2368A2");
