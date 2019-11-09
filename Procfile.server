@@ -1,2 +1,0 @@
-server: yarn workspace server watch
-bsb: yarn workspace server bs:watch
