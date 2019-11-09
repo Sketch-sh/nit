@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg"  x="0" y="0" viewBox="0 0 135 135">
+  <linearGradient id="bgGradient"  gradientUnits="userSpaceOnUse" x1="-9.88" y1="8.66" x2="159.605" y2="136.929" gradientTransform="translate(.491 1.399)">
+    <stop offset="0" stop-color="#36c2d8" />
+    <stop offset="1" stop-color="#514b9d"/>
+  </linearGradient>
+  <defs id="foo">
+  <path d="M8.091 8.059h125.28v125.28H8.091z" fill="url(#bgGradient)" />
+  <path stroke-miterlimit="10" d="M3.271 3.669h125.48v125.48H3.271z" fill="none" stroke="#514b9d"/>
+  <path d="M89.867 95.565l-8.224 5.066-44.506-72.24 8.225-5.067z" fill="#fff"/>
+  <path d="M103.511 126.919l.22-15.82-14.62 9z" id="path4035" fill="#fff"/>
+  <path class="st1" d="M104.099 85.714l-8.225 5.067-23.52-38.177 8.225-5.066z" fill="#fff"/>
+  <path class="st1" d="M96.138 14.474l8.189 5.125-23.787 38.01-8.189-5.124z" fill="#fff"/>
+  </defs>
+</svg>

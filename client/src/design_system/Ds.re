@@ -1,6 +1,6 @@
 module Unit = Ds_unit;
 module Button = Ds_button;
-
+module Logo = Ds_logo;
 open Css;
 let splitter_className =
   [unsafe("borderColor", "#E9ECEE !important")]->style;

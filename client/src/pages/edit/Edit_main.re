@@ -14,15 +14,17 @@ module S = {
         width(`percent(100.)),
         position(`absolute),
         left(`zero),
-        unsafe("background", "linear-gradient(to right, #9E7CC1, #8ECDEA)"),
+        unsafe("background", "linear-gradient(to right, #36C1D7, #514B9C)"),
       ]),
     ]
     ->style;
 
   let header =
     [
-      marginBottom(Space.s1),
-      padding2(~v=Space.s2, ~h=Space.s4),
+      height(`px(38)),
+      paddingLeft(Space.s2),
+      paddingRight(Space.s2),
+      // padding2(~v=Space.s2, ~h=Space.s4),
       display(`flex),
       alignItems(`center),
       justifyContent(`spaceBetween),
@@ -121,9 +123,9 @@ let make = (~value=default_value) => {
   });
 
   <Reflex.Container orientation="horizontal">
-    <Reflex.Element className=S.header_element flex=0.05>
+    <Reflex.Element className=S.header_element flex=0.058>
       <header className=S.header>
-        <span> "Nit"->str </span>
+        <div> <Ds.Logo sizeInPx=32 /> </div>
         <button onClick={_ => send(Update_url)}> "Share"->str </button>
         <div>
           <a
