@@ -42,7 +42,8 @@
     "reason-react": "github:reasonml/reason-react",
     "reason-react-update": "^0.1.1",
     "relude": "^0.19.0",
-    "sketch-stdlib": "^0.4.0"
+    "sketch-stdlib": "^0.4.0",
+    "konan": "^1.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
