@@ -6,7 +6,7 @@ let get_editor = (editor_ref, cb) => {
 };
 
 let update_markers = (~errors, ~warnings, ~editor_ref) => {
-  React.useEffect2(
+  React.useEffect3(
     () => {
       get_editor(
         editor_ref,
@@ -35,6 +35,6 @@ let update_markers = (~errors, ~warnings, ~editor_ref) => {
 
       None;
     },
-    (errors, warnings),
+    (errors, warnings, editor_ref->React.Ref.current),
   );
 };
