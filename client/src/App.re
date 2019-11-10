@@ -4,12 +4,11 @@
 let parse_query_string: (string, string) => string = [%raw
   {|
   function(name, query) {
-    console.log(name, query);
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var regex = new RegExp('[\\?&]?' + name + '=([^&#]*)');
     var results = regex.exec(query);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-}
+  }
 |}
 ];
 
@@ -19,12 +18,14 @@ let make = () => {
 
   let query = url.ReasonReactRouter.search;
 
+  let query_code = parse_query_string("code", query);
   let value =
-    switch (parse_query_string("code", query)) {
+    switch (query_code) {
     | "" => None
     | compressed_string => LzString.URI.decompress(compressed_string)
     };
 
+  [%log.debug "encoded data"; ("value", value); ("query_code", query_code)];
   <Edit_main ?value />;
 };
 
