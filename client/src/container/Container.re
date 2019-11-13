@@ -10,12 +10,16 @@ let clear_polestar = () => {
 let get_polestar = () => {
   switch (polestar^) {
   | None =>
-    Container_bundler.make_polestar(~onError=exn => {
-      %log.debug
-      "Clear polestar instance";
-      Js.log(exn);
-      clear_polestar();
-    })
+    Container_bundler.make_polestar(
+      ~onError=
+        exn => {
+          %log.debug
+          "Clear polestar instance";
+          Js.log(exn);
+          clear_polestar();
+        },
+      ~onEntry=() => to_host(Comm_eval_finished),
+    )
   | Some(polestar) => polestar
   };
 };
@@ -32,7 +36,8 @@ window->addMessageListener(
         switch (entry_content) {
         | None => ()
         | Some(entry_content) =>
-          Container_bundler.eval(get_polestar(), entry_content)
+          to_host(Comm_eval_start);
+          Container_bundler.eval(get_polestar(), entry_content);
         };
 
       | Comm_set_entry(filename) => entry_file := filename

@@ -40,6 +40,7 @@ type state = {
   active_file: filename,
   iframe_ref: ref(Js.nullable(Dom.element)),
   log: array(ConsoleFeed.log),
+  evaling: bool,
 };
 
 type action =
@@ -114,7 +115,7 @@ let reducer = (action, state) => {
       | None => NoUpdate
       | Some({code}) =>
         SideEffects(
-          (_) => {
+          _ => {
             ReasonReactRouter.push("?code=" ++ LzString.URI.compress(code));
             None;
           },
@@ -176,6 +177,8 @@ let reducer = (action, state) => {
       | Comm_send_log(log) =>
         let decoded = ConsoleFeed.decode(log);
         Update({...state, log: ImmutableArray.unshift(state.log, decoded)});
+      | Comm_eval_start => Update({...state, evaling: true})
+      | Comm_eval_finished => Update({...state, evaling: false})
       }
     }
   );

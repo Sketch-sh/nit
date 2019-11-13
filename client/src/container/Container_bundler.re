@@ -156,7 +156,7 @@ let fetcher =
        );
   };
 
-let make_polestar = (~onError) =>
+let make_polestar = (~onError, ~onEntry) =>
   Polestar.make({
     "globals": globals,
     "moduleThis": B.window,
@@ -164,8 +164,7 @@ let make_polestar = (~onError) =>
     "resolver": Polestar.defaultResolver,
     "onEntry":
       (.) => {
-        (); // Should send back to host about execution done or something
-          // Js.log("onEntry");
+        onEntry();
       },
     "onError":
       (. error) => {

@@ -49,6 +49,25 @@ module S = {
       height(`percent(100.)),
     ]
     ->style;
+
+  let overlay =
+    [
+      position(`absolute),
+      top(`zero),
+      right(`zero),
+      bottom(`zero),
+      left(`zero),
+      borderStyle(`none),
+      width(`percent(100.)),
+      height(`percent(100.)),
+      zIndex(1),
+      fontSize(`rem(2.)),
+      display(`flex),
+      justifyContent(`center),
+      alignItems(`center),
+      height(`percent(100.)),
+    ]
+    ->style;
 };
 
 let default_value_react = {code|module Counter = {
@@ -89,6 +108,7 @@ let make = (~value="") => {
         active_file: "index.re",
         iframe_ref: ref(Js.Nullable.null),
         log: [||],
+        evaling: false,
       },
       reducer,
     );
@@ -155,6 +175,9 @@ let make = (~value="") => {
           <Reflex.Container orientation="horizontal">
             <Reflex.Element>
               <section className=S.preview_container>
+                {state.evaling
+                   ? <div className=S.overlay> "Compiling..."->str </div>
+                   : React.null}
                 <iframe
                   id="frame"
                   className=S.frame

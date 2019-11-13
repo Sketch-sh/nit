@@ -6,4 +6,6 @@ type from_host =
 
 type to_host =
   | Comm_ready
-  | Comm_send_log(ConsoleFeed.log_encoded);
+  | Comm_send_log(ConsoleFeed.log_encoded)
+  | Comm_eval_start
+  | Comm_eval_finished;
