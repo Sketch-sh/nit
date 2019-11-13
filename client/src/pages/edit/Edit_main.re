@@ -70,15 +70,17 @@ module S = {
     ->style;
 };
 
-let default_value_react = {code|module Counter = {
+let default_value_react = {code|let str = React.string;
+
+module Counter = {
   [@react.component]
   let make = (~name) => {
     let (count, setCount) = React.useState(() => 0);
 
     <div>
-      <p> {React.string(name ++ " clicked " ++ string_of_int(count) ++ " times")} </p>
+      <p> {str({j|$name clicked $count times|j})} </p>
       <button onClick={_ => setCount(_ => count + 1)}>
-        {React.string("Click me")}
+        {str("Click me")}
       </button>
     </div>
   };
@@ -100,7 +102,7 @@ let make_initial_files = value => {
 {|require("react-reflex/styles.css")|};
 
 [@react.component]
-let make = (~value="") => {
+let make = (~value=default_value_react) => {
   let (state, send) =
     ReactUpdate.useReducer(
       {
