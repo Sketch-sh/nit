@@ -4,7 +4,7 @@ var Curry = require("./curry.js");
 var Belt_MapDict = require("./belt_MapDict.js");
 
 function fromArray(data, id) {
-  var cmp = id[/* cmp */0];
+  var cmp = id.cmp;
   return {
           cmp: cmp,
           data: Belt_MapDict.fromArray(data, cmp)
@@ -12,8 +12,8 @@ function fromArray(data, id) {
 }
 
 function remove(m, x) {
-  var cmp = m.cmp;
   var odata = m.data;
+  var cmp = m.cmp;
   var newData = Belt_MapDict.remove(odata, x, cmp);
   if (newData === odata) {
     return m;
@@ -27,8 +27,7 @@ function remove(m, x) {
 
 function removeMany(m, x) {
   var cmp = m.cmp;
-  var odata = m.data;
-  var newData = Belt_MapDict.removeMany(odata, x, cmp);
+  var newData = Belt_MapDict.removeMany(m.data, x, cmp);
   return {
           cmp: cmp,
           data: newData
@@ -96,8 +95,8 @@ function merge(s1, s2, f) {
 
 function make(id) {
   return {
-          cmp: id[/* cmp */0],
-          data: Belt_MapDict.empty
+          cmp: id.cmp,
+          data: undefined
         };
 }
 
@@ -289,27 +288,29 @@ function cmp(m1, m2, vcmp) {
   return cmpU(m1, m2, Curry.__2(vcmp));
 }
 
-function getData(prim) {
-  return prim.data;
+function getData(m) {
+  return m.data;
 }
 
 function getId(m) {
   var cmp = m.cmp;
-  return /* module */[/* cmp */cmp];
+  return {
+          cmp: cmp
+        };
 }
 
 function packIdData(id, data) {
   return {
-          cmp: id[/* cmp */0],
+          cmp: id.cmp,
           data: data
         };
 }
 
-var Int = 0;
+var Int;
 
-var $$String = 0;
+var $$String;
 
-var Dict = 0;
+var Dict;
 
 exports.Int = Int;
 exports.$$String = $$String;

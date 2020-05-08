@@ -1,7 +1,7 @@
 'use strict';
 
 
-var undefinedHeader = /* array */[];
+var undefinedHeader = [];
 
 function some(x) {
   if (x === undefined) {
@@ -11,22 +11,22 @@ function some(x) {
     ];
     block.tag = 256;
     return block;
-  } else if (x !== null && x[0] === undefinedHeader) {
-    var nid = x[1] + 1 | 0;
-    var block$1 = /* tuple */[
-      undefinedHeader,
-      nid
-    ];
-    block$1.tag = 256;
-    return block$1;
-  } else {
+  }
+  if (!(x !== null && x[0] === undefinedHeader)) {
     return x;
   }
+  var nid = x[1] + 1 | 0;
+  var block$1 = /* tuple */[
+    undefinedHeader,
+    nid
+  ];
+  block$1.tag = 256;
+  return block$1;
 }
 
 function nullable_to_opt(x) {
   if (x === null || x === undefined) {
-    return undefined;
+    return ;
   } else {
     return some(x);
   }
@@ -34,7 +34,7 @@ function nullable_to_opt(x) {
 
 function undefined_to_opt(x) {
   if (x === undefined) {
-    return undefined;
+    return ;
   } else {
     return some(x);
   }
@@ -42,31 +42,30 @@ function undefined_to_opt(x) {
 
 function null_to_opt(x) {
   if (x === null) {
-    return undefined;
+    return ;
   } else {
     return some(x);
   }
 }
 
 function valFromOption(x) {
-  if (x !== null && x[0] === undefinedHeader) {
-    var depth = x[1];
-    if (depth === 0) {
-      return undefined;
-    } else {
-      return /* tuple */[
-              undefinedHeader,
-              depth - 1 | 0
-            ];
-    }
-  } else {
+  if (!(x !== null && x[0] === undefinedHeader)) {
     return x;
+  }
+  var depth = x[1];
+  if (depth === 0) {
+    return ;
+  } else {
+    return /* tuple */[
+            undefinedHeader,
+            depth - 1 | 0
+          ];
   }
 }
 
 function option_get(x) {
   if (x === undefined) {
-    return undefined;
+    return ;
   } else {
     return valFromOption(x);
   }
@@ -74,7 +73,7 @@ function option_get(x) {
 
 function option_get_unwrap(x) {
   if (x === undefined) {
-    return undefined;
+    return ;
   } else {
     return valFromOption(x)[1];
   }

@@ -1,41 +1,39 @@
 'use strict';
 
 
-var Id = 0;
+var Id;
 
-var $$Array = 0;
+var $$Array;
 
-var SortArray = 0;
+var SortArray;
 
-var MutableQueue = 0;
+var MutableQueue;
 
-var MutableStack = 0;
+var MutableStack;
 
-var List = 0;
+var List;
 
-var $$Range = 0;
+var $$Range;
 
-var $$Set = 0;
+var $$Set;
 
-var $$Map = 0;
+var $$Map;
 
-var MutableSet = 0;
+var MutableSet;
 
-var MutableMap = 0;
+var MutableMap;
 
-var HashSet = 0;
+var HashSet;
 
-var HashMap = 0;
+var HashMap;
 
-var $$Option = 0;
+var $$Option;
 
-var Result = 0;
+var Result;
 
-var Int = 0;
+var Int;
 
-var Float = 0;
-
-var Debug = 0;
+var Float;
 
 exports.Id = Id;
 exports.$$Array = $$Array;
@@ -54,5 +52,4 @@ exports.$$Option = $$Option;
 exports.Result = Result;
 exports.Int = Int;
 exports.Float = Float;
-exports.Debug = Debug;
 /* No side effect */

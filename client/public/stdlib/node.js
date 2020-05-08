@@ -15,17 +15,17 @@ function test(x) {
   }
 }
 
-var Path = 0;
+var Path;
 
-var Fs = 0;
+var Fs;
 
-var Process = 0;
+var Process;
 
-var Module = 0;
+var Module;
 
-var $$Buffer = 0;
+var $$Buffer;
 
-var Child_process = 0;
+var Child_process;
 
 exports.Path = Path;
 exports.Fs = Fs;

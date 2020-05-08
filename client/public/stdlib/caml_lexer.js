@@ -1,8 +1,5 @@
 'use strict';
 
-var Caml_builtin_exceptions = require("./caml_builtin_exceptions.js");
-
- 
 
 /***********************************************************************/
 /*                                                                     */
@@ -32,30 +29,30 @@ function caml_lex_array(s) {
         a[i] = (s.charCodeAt(2 * i) | (s.charCodeAt(2 * i + 1) << 8)) << 16 >> 16;
     return a;
 }
-
 ;
 
-function caml_lex_engine_aux (tbl,start_state,lexbuf,exn){
+var caml_lex_engine_aux = (function (tbl, start_state, lexbuf, exn){
     // Lexing.lexbuf
-    var lex_buffer = 1;
-    var lex_buffer_len = 2;
-    var lex_start_pos = 4;
-    var lex_curr_pos = 5;
-    var lex_last_pos = 6;
-    var lex_last_action = 7;
-    var lex_eof_reached = 8;
+    var lex_buffer = 'lex_buffer';
+    var lex_buffer_len = 'lex_buffer_len';
+    var lex_start_pos = 'lex_start_pos';
+    var lex_curr_pos = 'lex_curr_pos';
+    var lex_last_pos = 'lex_last_pos';
+    var lex_last_action = 'lex_last_action';
+    var lex_eof_reached = 'lex_eof_reached';
     // Lexing.lex_tables
-    var lex_base = 0;
-    var lex_backtrk = 1;
-    var lex_default = 2;
-    var lex_trans = 3;
-    var lex_check = 4;
-    if (!tbl.lex_default) {
+    var lex_base = 'lex_base';
+    var lex_backtrk = 'lex_backtrk';
+    var lex_default = 'lex_default';
+    var lex_trans = 'lex_trans';
+    var lex_check = 'lex_check';
+    if (!tbl.processed) {
         tbl.lex_base = caml_lex_array(tbl[lex_base]);
         tbl.lex_backtrk = caml_lex_array(tbl[lex_backtrk]);
         tbl.lex_check = caml_lex_array(tbl[lex_check]);
         tbl.lex_trans = caml_lex_array(tbl[lex_trans]);
         tbl.lex_default = caml_lex_array(tbl[lex_default]);
+        tbl.processed = true;
     }
     var c;
     var state = start_state;
@@ -116,19 +113,16 @@ function caml_lex_engine_aux (tbl,start_state,lexbuf,exn){
                 lexbuf[lex_eof_reached] = 0;
         }
     }
-};
+});
 
 var empty_token_lit = "lexing: empty token";
 
 function caml_lex_engine(tbls, i, buf) {
-  return caml_lex_engine_aux(tbls, i, buf, [
-              Caml_builtin_exceptions.failure,
-              empty_token_lit
-            ]);
+  return caml_lex_engine_aux(tbls, i, buf, {
+              RE_EXN_ID: "Failure",
+              _1: empty_token_lit
+            });
 }
-
-
-
 
 /***********************************************/
 /* New lexer engine, with memory of positions  */
@@ -174,48 +168,42 @@ function caml_lex_run_tag(s, i, mem) {
             mem[dst] = mem[src];
     }
 }
-
 ;
 
-function caml_new_lex_engine_aux (tbl,start_state,lexbuf,exn){
+var caml_new_lex_engine_aux = (function (tbl, start_state, lexbuf, exn) {
     // Lexing.lexbuf
-    var lex_buffer = 1;
-    var lex_buffer_len = 2;
-    var lex_start_pos = 4;
-    var lex_curr_pos = 5;
-    var lex_last_pos = 6;
-    var lex_last_action = 7;
-    var lex_eof_reached = 8;
-    var lex_mem = 9;
+    var lex_buffer = 'lex_buffer';
+    var lex_buffer_len = 'lex_buffer_len';
+    var lex_start_pos = 'lex_start_pos';
+    var lex_curr_pos = 'lex_curr_pos';
+    var lex_last_pos = 'lex_last_pos';
+    var lex_last_action = 'lex_last_action';
+    var lex_eof_reached = 'lex_eof_reached';
+    var lex_mem = 'lex_mem';
     // Lexing.lex_tables
-    var lex_base = 0;
-    var lex_backtrk = 1;
-    var lex_default = 2;
-    var lex_trans = 3;
-    var lex_check = 4;
-    var lex_base_code = 5;
-    var lex_backtrk_code = 6;
-    var lex_default_code = 7;
-    var lex_trans_code = 8;
-    var lex_check_code = 9;
-    var lex_code = 10;
-    if (!tbl.lex_default) {
+    var lex_base = 'lex_base';
+    var lex_backtrk = 'lex_backtrk';
+    var lex_default = 'lex_default';
+    var lex_trans = 'lex_trans';
+    var lex_check = 'lex_check';
+    var lex_base_code = 'lex_base_code';
+    var lex_backtrk_code = 'lex_backtrk_code';
+    var lex_default_code = 'lex_default_code';
+    var lex_trans_code = 'lex_trans_code';
+    var lex_check_code = 'lex_check_code';
+    var lex_code = 'lex_code';
+    if (!tbl.processed) {
         tbl.lex_base = caml_lex_array(tbl[lex_base]);
         tbl.lex_backtrk = caml_lex_array(tbl[lex_backtrk]);
         tbl.lex_check = caml_lex_array(tbl[lex_check]);
         tbl.lex_trans = caml_lex_array(tbl[lex_trans]);
         tbl.lex_default = caml_lex_array(tbl[lex_default]);
-    }
-    if (!tbl.lex_default_code) {
         tbl.lex_base_code = caml_lex_array(tbl[lex_base_code]);
         tbl.lex_backtrk_code = caml_lex_array(tbl[lex_backtrk_code]);
         tbl.lex_check_code = caml_lex_array(tbl[lex_check_code]);
         tbl.lex_trans_code = caml_lex_array(tbl[lex_trans_code]);
         tbl.lex_default_code = caml_lex_array(tbl[lex_default_code]);
-    }
-    if (tbl.lex_code == null) {
-        //tbl.lex_code = caml_bytes_of_string(tbl[lex_code]);
-        tbl.lex_code = (tbl[lex_code]);
+        tbl.processed = true;
     }
     var c, state = start_state;
     //var buffer = caml_bytes_of_string(lexbuf[lex_buffer]);
@@ -287,13 +275,13 @@ function caml_new_lex_engine_aux (tbl,start_state,lexbuf,exn){
                 lexbuf[lex_eof_reached] = 0;
         }
     }
-};
+    });
 
 function caml_new_lex_engine(tbl, i, buf) {
-  return caml_new_lex_engine_aux(tbl, i, buf, [
-              Caml_builtin_exceptions.failure,
-              empty_token_lit
-            ]);
+  return caml_new_lex_engine_aux(tbl, i, buf, {
+              RE_EXN_ID: "Failure",
+              _1: empty_token_lit
+            });
 }
 
 exports.caml_lex_engine = caml_lex_engine;
