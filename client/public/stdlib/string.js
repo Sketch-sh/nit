@@ -1,11 +1,10 @@
 'use strict';
 
-var List = require("./list.js");
 var Bytes = require("./bytes.js");
+var Curry = require("./curry.js");
 var Caml_bytes = require("./caml_bytes.js");
-var Caml_int32 = require("./caml_int32.js");
 var Caml_primitive = require("./caml_primitive.js");
-var Caml_builtin_exceptions = require("./caml_builtin_exceptions.js");
+var Caml_js_exceptions = require("./caml_js_exceptions.js");
 
 function make(n, c) {
   return Caml_bytes.bytes_to_string(Bytes.make(n, c));
@@ -23,38 +22,76 @@ function sub(s, ofs, len) {
   return Caml_bytes.bytes_to_string(Bytes.sub(Caml_bytes.bytes_of_string(s), ofs, len));
 }
 
+function ensure_ge(x, y) {
+  if (x >= y) {
+    return x;
+  }
+  throw {
+        RE_EXN_ID: "Invalid_argument",
+        _1: "String.concat",
+        Error: new Error()
+      };
+}
+
+function sum_lengths(_acc, seplen, _param) {
+  while(true) {
+    var param = _param;
+    var acc = _acc;
+    if (!param) {
+      return acc;
+    }
+    var tl = param[1];
+    var hd = param[0];
+    if (!tl) {
+      return hd.length + acc | 0;
+    }
+    _param = tl;
+    _acc = ensure_ge((hd.length + seplen | 0) + acc | 0, acc);
+    continue ;
+  };
+}
+
+function unsafe_blits(dst, _pos, sep, seplen, _param) {
+  while(true) {
+    var param = _param;
+    var pos = _pos;
+    if (!param) {
+      return dst;
+    }
+    var tl = param[1];
+    var hd = param[0];
+    if (tl) {
+      Caml_bytes.caml_blit_string(hd, 0, dst, pos, hd.length);
+      Caml_bytes.caml_blit_string(sep, 0, dst, pos + hd.length | 0, seplen);
+      _param = tl;
+      _pos = (pos + hd.length | 0) + seplen | 0;
+      continue ;
+    }
+    Caml_bytes.caml_blit_string(hd, 0, dst, pos, hd.length);
+    return dst;
+  };
+}
+
 function concat(sep, l) {
-  if (l) {
-    var hd = l[0];
-    var num = /* record */[/* contents */0];
-    var len = /* record */[/* contents */0];
-    List.iter((function (s) {
-            num[0] = num[0] + 1 | 0;
-            len[0] = len[0] + s.length | 0;
-            return /* () */0;
-          }), l);
-    var r = Caml_bytes.caml_create_bytes(len[0] + Caml_int32.imul(sep.length, num[0] - 1 | 0) | 0);
-    Caml_bytes.caml_blit_string(hd, 0, r, 0, hd.length);
-    var pos = /* record */[/* contents */hd.length];
-    List.iter((function (s) {
-            Caml_bytes.caml_blit_string(sep, 0, r, pos[0], sep.length);
-            pos[0] = pos[0] + sep.length | 0;
-            Caml_bytes.caml_blit_string(s, 0, r, pos[0], s.length);
-            pos[0] = pos[0] + s.length | 0;
-            return /* () */0;
-          }), l[1]);
-    return Caml_bytes.bytes_to_string(r);
-  } else {
+  if (!l) {
     return "";
   }
+  var seplen = sep.length;
+  return Caml_bytes.bytes_to_string(unsafe_blits(Caml_bytes.caml_create_bytes(sum_lengths(0, seplen, l)), 0, sep, seplen, l));
 }
 
 function iter(f, s) {
-  return Bytes.iter(f, Caml_bytes.bytes_of_string(s));
+  for(var i = 0 ,i_finish = s.length; i < i_finish; ++i){
+    Curry._1(f, s.charCodeAt(i));
+  }
+  
 }
 
 function iteri(f, s) {
-  return Bytes.iteri(f, Caml_bytes.bytes_of_string(s));
+  for(var i = 0 ,i_finish = s.length; i < i_finish; ++i){
+    Curry._2(f, i, s.charCodeAt(i));
+  }
+  
 }
 
 function map(f, s) {
@@ -88,27 +125,24 @@ function escaped(s) {
       var i = _i;
       if (i >= s.length) {
         return false;
-      } else {
-        var match = s.charCodeAt(i);
-        if (match >= 32) {
-          var switcher = match - 34 | 0;
-          if (switcher > 58 || switcher < 0) {
-            if (switcher >= 93) {
-              return true;
-            } else {
-              _i = i + 1 | 0;
-              continue ;
-            }
-          } else if (switcher > 57 || switcher < 1) {
-            return true;
-          } else {
-            _i = i + 1 | 0;
-            continue ;
-          }
-        } else {
+      }
+      var match = s.charCodeAt(i);
+      if (match < 32) {
+        return true;
+      }
+      var switcher = match - 34 | 0;
+      if (switcher > 58 || switcher < 0) {
+        if (switcher >= 93) {
           return true;
         }
+        _i = i + 1 | 0;
+        continue ;
       }
+      if (switcher > 57 || switcher < 1) {
+        return true;
+      }
+      _i = i + 1 | 0;
+      continue ;
     };
   };
   if (needs_escape(0)) {
@@ -122,14 +156,16 @@ function index_rec(s, lim, _i, c) {
   while(true) {
     var i = _i;
     if (i >= lim) {
-      throw Caml_builtin_exceptions.not_found;
+      throw {
+            RE_EXN_ID: "Not_found",
+            Error: new Error()
+          };
     }
     if (s.charCodeAt(i) === c) {
       return i;
-    } else {
-      _i = i + 1 | 0;
-      continue ;
     }
+    _i = i + 1 | 0;
+    continue ;
   };
 }
 
@@ -137,29 +173,62 @@ function index(s, c) {
   return index_rec(s, s.length, 0, c);
 }
 
+function index_rec_opt(s, lim, _i, c) {
+  while(true) {
+    var i = _i;
+    if (i >= lim) {
+      return ;
+    }
+    if (s.charCodeAt(i) === c) {
+      return i;
+    }
+    _i = i + 1 | 0;
+    continue ;
+  };
+}
+
+function index_opt(s, c) {
+  return index_rec_opt(s, s.length, 0, c);
+}
+
 function index_from(s, i, c) {
   var l = s.length;
   if (i < 0 || i > l) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "String.index_from / Bytes.index_from"
-        ];
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "String.index_from / Bytes.index_from",
+          Error: new Error()
+        };
   }
   return index_rec(s, l, i, c);
+}
+
+function index_from_opt(s, i, c) {
+  var l = s.length;
+  if (i < 0 || i > l) {
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "String.index_from_opt / Bytes.index_from_opt",
+          Error: new Error()
+        };
+  }
+  return index_rec_opt(s, l, i, c);
 }
 
 function rindex_rec(s, _i, c) {
   while(true) {
     var i = _i;
     if (i < 0) {
-      throw Caml_builtin_exceptions.not_found;
+      throw {
+            RE_EXN_ID: "Not_found",
+            Error: new Error()
+          };
     }
     if (s.charCodeAt(i) === c) {
       return i;
-    } else {
-      _i = i - 1 | 0;
-      continue ;
     }
+    _i = i - 1 | 0;
+    continue ;
   };
 }
 
@@ -169,32 +238,63 @@ function rindex(s, c) {
 
 function rindex_from(s, i, c) {
   if (i < -1 || i >= s.length) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "String.rindex_from / Bytes.rindex_from"
-        ];
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "String.rindex_from / Bytes.rindex_from",
+          Error: new Error()
+        };
   }
   return rindex_rec(s, i, c);
+}
+
+function rindex_rec_opt(s, _i, c) {
+  while(true) {
+    var i = _i;
+    if (i < 0) {
+      return ;
+    }
+    if (s.charCodeAt(i) === c) {
+      return i;
+    }
+    _i = i - 1 | 0;
+    continue ;
+  };
+}
+
+function rindex_opt(s, c) {
+  return rindex_rec_opt(s, s.length - 1 | 0, c);
+}
+
+function rindex_from_opt(s, i, c) {
+  if (i < -1 || i >= s.length) {
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "String.rindex_from_opt / Bytes.rindex_from_opt",
+          Error: new Error()
+        };
+  }
+  return rindex_rec_opt(s, i, c);
 }
 
 function contains_from(s, i, c) {
   var l = s.length;
   if (i < 0 || i > l) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "String.contains_from / Bytes.contains_from"
-        ];
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "String.contains_from / Bytes.contains_from",
+          Error: new Error()
+        };
   }
   try {
     index_rec(s, l, i, c);
     return true;
   }
-  catch (exn){
-    if (exn === Caml_builtin_exceptions.not_found) {
+  catch (raw_exn){
+    var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
+    if (exn.RE_EXN_ID === "Not_found") {
       return false;
-    } else {
-      throw exn;
     }
+    throw exn;
   }
 }
 
@@ -204,22 +304,60 @@ function contains(s, c) {
 
 function rcontains_from(s, i, c) {
   if (i < 0 || i >= s.length) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "String.rcontains_from / Bytes.rcontains_from"
-        ];
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "String.rcontains_from / Bytes.rcontains_from",
+          Error: new Error()
+        };
   }
   try {
     rindex_rec(s, i, c);
     return true;
   }
-  catch (exn){
-    if (exn === Caml_builtin_exceptions.not_found) {
+  catch (raw_exn){
+    var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
+    if (exn.RE_EXN_ID === "Not_found") {
       return false;
-    } else {
-      throw exn;
     }
+    throw exn;
   }
+}
+
+function uppercase_ascii(s) {
+  return Caml_bytes.bytes_to_string(Bytes.uppercase_ascii(Caml_bytes.bytes_of_string(s)));
+}
+
+function lowercase_ascii(s) {
+  return Caml_bytes.bytes_to_string(Bytes.lowercase_ascii(Caml_bytes.bytes_of_string(s)));
+}
+
+function capitalize_ascii(s) {
+  return Caml_bytes.bytes_to_string(Bytes.capitalize_ascii(Caml_bytes.bytes_of_string(s)));
+}
+
+function uncapitalize_ascii(s) {
+  return Caml_bytes.bytes_to_string(Bytes.uncapitalize_ascii(Caml_bytes.bytes_of_string(s)));
+}
+
+var compare = Caml_primitive.caml_string_compare;
+
+function split_on_char(sep, s) {
+  var r = /* [] */0;
+  var j = s.length;
+  for(var i = s.length - 1 | 0; i >= 0; --i){
+    if (s.charCodeAt(i) === sep) {
+      r = /* :: */[
+        sub(s, i + 1 | 0, (j - i | 0) - 1 | 0),
+        r
+      ];
+      j = i;
+    }
+    
+  }
+  return /* :: */[
+          sub(s, 0, j),
+          r
+        ];
 }
 
 function uppercase(s) {
@@ -238,11 +376,13 @@ function uncapitalize(s) {
   return Caml_bytes.bytes_to_string(Bytes.uncapitalize(Caml_bytes.bytes_of_string(s)));
 }
 
-var compare = Caml_primitive.caml_string_compare;
-
 var fill = Bytes.fill;
 
 var blit = Bytes.blit_string;
+
+function equal(prim, prim$1) {
+  return prim === prim$1;
+}
 
 exports.make = make;
 exports.init = init;
@@ -258,9 +398,13 @@ exports.mapi = mapi;
 exports.trim = trim;
 exports.escaped = escaped;
 exports.index = index;
+exports.index_opt = index_opt;
 exports.rindex = rindex;
+exports.rindex_opt = rindex_opt;
 exports.index_from = index_from;
+exports.index_from_opt = index_from_opt;
 exports.rindex_from = rindex_from;
+exports.rindex_from_opt = rindex_from_opt;
 exports.contains = contains;
 exports.contains_from = contains_from;
 exports.rcontains_from = rcontains_from;
@@ -268,5 +412,11 @@ exports.uppercase = uppercase;
 exports.lowercase = lowercase;
 exports.capitalize = capitalize;
 exports.uncapitalize = uncapitalize;
+exports.uppercase_ascii = uppercase_ascii;
+exports.lowercase_ascii = lowercase_ascii;
+exports.capitalize_ascii = capitalize_ascii;
+exports.uncapitalize_ascii = uncapitalize_ascii;
 exports.compare = compare;
+exports.equal = equal;
+exports.split_on_char = split_on_char;
 /* No side effect */

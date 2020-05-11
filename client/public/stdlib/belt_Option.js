@@ -3,12 +3,22 @@
 var Curry = require("./curry.js");
 var Caml_option = require("./caml_option.js");
 
-function getExn(param) {
-  if (param !== undefined) {
-    return Caml_option.valFromOption(param);
-  } else {
-    throw new Error("getExn");
+function forEachU(opt, f) {
+  if (opt !== undefined) {
+    return f(Caml_option.valFromOption(opt));
   }
+  
+}
+
+function forEach(opt, f) {
+  return forEachU(opt, Curry.__1(f));
+}
+
+function getExn(x) {
+  if (x !== undefined) {
+    return Caml_option.valFromOption(x);
+  }
+  throw new Error("getExn");
 }
 
 function mapWithDefaultU(opt, $$default, f) {
@@ -95,6 +105,8 @@ function cmp(a, b, f) {
   return cmpU(a, b, Curry.__2(f));
 }
 
+exports.forEachU = forEachU;
+exports.forEach = forEach;
 exports.getExn = getExn;
 exports.mapWithDefaultU = mapWithDefaultU;
 exports.mapWithDefault = mapWithDefault;

@@ -1,13 +1,13 @@
 'use strict';
 
 
-var $$Array = 0;
+var $$Array;
 
-var Bytes = 0;
+var Bytes;
 
-var List = 0;
+var List;
 
-var $$String = 0;
+var $$String;
 
 exports.$$Array = $$Array;
 exports.Bytes = Bytes;

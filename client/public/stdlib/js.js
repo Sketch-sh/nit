@@ -1,64 +1,67 @@
 'use strict';
 
 
-var Internal = /* module */[];
+var Fn = { };
 
-var MapperRt = 0;
+var Internal = { };
 
-var Null = 0;
+var MapperRt;
 
-var Undefined = 0;
+var Null;
 
-var Nullable = 0;
+var Undefined;
 
-var Null_undefined = 0;
+var Nullable;
 
-var Exn = 0;
+var Null_undefined;
 
-var $$Array = 0;
+var Exn;
 
-var Array2 = 0;
+var $$Array;
 
-var $$String = 0;
+var Array2;
 
-var String2 = 0;
+var $$String;
 
-var Re = 0;
+var String2;
 
-var $$Promise = 0;
+var Re;
 
-var $$Date = 0;
+var $$Promise;
 
-var Dict = 0;
+var $$Date;
 
-var Global = 0;
+var Dict;
 
-var Json = 0;
+var Global;
 
-var $$Math = 0;
+var Json;
 
-var Obj = 0;
+var $$Math;
 
-var Typed_array = 0;
+var Obj;
 
-var TypedArray2 = 0;
+var Typed_array;
 
-var Types = 0;
+var TypedArray2;
 
-var Float = 0;
+var Types;
 
-var Int = 0;
+var Float;
 
-var $$Option = 0;
+var Int;
 
-var Result = 0;
+var $$Option;
 
-var List = 0;
+var Result;
 
-var Vector = 0;
+var List;
 
-var Console = 0;
+var Vector;
 
+var Console;
+
+exports.Fn = Fn;
 exports.MapperRt = MapperRt;
 exports.Internal = Internal;
 exports.Null = Null;

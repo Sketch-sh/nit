@@ -4,7 +4,7 @@ var Curry = require("./curry.js");
 var Belt_SetDict = require("./belt_SetDict.js");
 
 function fromArray(data, id) {
-  var cmp = id[/* cmp */0];
+  var cmp = id.cmp;
   return {
           cmp: cmp,
           data: Belt_SetDict.fromArray(data, cmp)
@@ -12,8 +12,8 @@ function fromArray(data, id) {
 }
 
 function remove(m, e) {
-  var cmp = m.cmp;
   var data = m.data;
+  var cmp = m.cmp;
   var newData = Belt_SetDict.remove(data, e, cmp);
   if (newData === data) {
     return m;
@@ -26,8 +26,8 @@ function remove(m, e) {
 }
 
 function add(m, e) {
-  var cmp = m.cmp;
   var data = m.data;
+  var cmp = m.cmp;
   var newData = Belt_SetDict.add(data, e, cmp);
   if (newData === data) {
     return m;
@@ -105,8 +105,8 @@ function split(m, e) {
 
 function make(id) {
   return {
-          cmp: id[/* cmp */0],
-          data: Belt_SetDict.empty
+          cmp: id.cmp,
+          data: undefined
         };
 }
 
@@ -231,23 +231,25 @@ function has(m, e) {
 
 function fromSortedArrayUnsafe(xs, id) {
   return {
-          cmp: id[/* cmp */0],
+          cmp: id.cmp,
           data: Belt_SetDict.fromSortedArrayUnsafe(xs)
         };
 }
 
-function getData(prim) {
-  return prim.data;
+function getData(m) {
+  return m.data;
 }
 
 function getId(m) {
   var cmp = m.cmp;
-  return /* module */[/* cmp */cmp];
+  return {
+          cmp: cmp
+        };
 }
 
 function packIdData(id, data) {
   return {
-          cmp: id[/* cmp */0],
+          cmp: id.cmp,
           data: data
         };
 }
@@ -256,11 +258,11 @@ function checkInvariantInternal(d) {
   return Belt_SetDict.checkInvariantInternal(d.data);
 }
 
-var Int = 0;
+var Int;
 
-var $$String = 0;
+var $$String;
 
-var Dict = 0;
+var Dict;
 
 exports.Int = Int;
 exports.$$String = $$String;

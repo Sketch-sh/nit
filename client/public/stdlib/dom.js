@@ -1,9 +1,9 @@
 'use strict';
 
 
-var $$Storage = 0;
+var $$Storage;
 
-var Storage2 = 0;
+var Storage2;
 
 exports.$$Storage = $$Storage;
 exports.Storage2 = Storage2;

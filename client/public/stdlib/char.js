@@ -1,14 +1,14 @@
 'use strict';
 
 var Caml_bytes = require("./caml_bytes.js");
-var Caml_builtin_exceptions = require("./caml_builtin_exceptions.js");
 
 function chr(n) {
   if (n < 0 || n > 255) {
-    throw [
-          Caml_builtin_exceptions.invalid_argument,
-          "Char.chr"
-        ];
+    throw {
+          RE_EXN_ID: "Invalid_argument",
+          _1: "Char.chr",
+          Error: new Error()
+        };
   }
   return n;
 }
@@ -16,46 +16,44 @@ function chr(n) {
 function escaped(c) {
   var exit = 0;
   if (c >= 40) {
-    if (c !== 92) {
-      exit = c >= 127 ? 1 : 2;
-    } else {
+    if (c === 92) {
       return "\\\\";
     }
+    exit = c >= 127 ? 1 : 2;
   } else if (c >= 32) {
     if (c >= 39) {
       return "\\'";
-    } else {
-      exit = 2;
     }
+    exit = 2;
   } else if (c >= 14) {
     exit = 1;
   } else {
     switch (c) {
-      case 8 : 
+      case 8 :
           return "\\b";
-      case 9 : 
+      case 9 :
           return "\\t";
-      case 10 : 
+      case 10 :
           return "\\n";
-      case 0 : 
-      case 1 : 
-      case 2 : 
-      case 3 : 
-      case 4 : 
-      case 5 : 
-      case 6 : 
-      case 7 : 
-      case 11 : 
-      case 12 : 
+      case 0 :
+      case 1 :
+      case 2 :
+      case 3 :
+      case 4 :
+      case 5 :
+      case 6 :
+      case 7 :
+      case 11 :
+      case 12 :
           exit = 1;
           break;
-      case 13 : 
+      case 13 :
           return "\\r";
       
     }
   }
   switch (exit) {
-    case 1 : 
+    case 1 :
         var s = [
           0,
           0,
@@ -67,7 +65,7 @@ function escaped(c) {
         s[2] = 48 + (c / 10 | 0) % 10 | 0;
         s[3] = 48 + c % 10 | 0;
         return Caml_bytes.bytes_to_string(s);
-    case 2 : 
+    case 2 :
         var s$1 = [0];
         s$1[0] = c;
         return Caml_bytes.bytes_to_string(s$1);
@@ -91,13 +89,36 @@ function uppercase(c) {
   }
 }
 
+function lowercase_ascii(c) {
+  if (c >= /* "A" */65 && c <= /* "Z" */90) {
+    return c + 32 | 0;
+  } else {
+    return c;
+  }
+}
+
+function uppercase_ascii(c) {
+  if (c >= /* "a" */97 && c <= /* "z" */122) {
+    return c - 32 | 0;
+  } else {
+    return c;
+  }
+}
+
 function compare(c1, c2) {
   return c1 - c2 | 0;
+}
+
+function equal(c1, c2) {
+  return (c1 - c2 | 0) === 0;
 }
 
 exports.chr = chr;
 exports.escaped = escaped;
 exports.lowercase = lowercase;
 exports.uppercase = uppercase;
+exports.lowercase_ascii = lowercase_ascii;
+exports.uppercase_ascii = uppercase_ascii;
 exports.compare = compare;
+exports.equal = equal;
 /* No side effect */
